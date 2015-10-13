@@ -192,6 +192,17 @@ namespace WPFMediaKit.MediaFoundation
         /// <returns></returns>
         public static EvrPresenter CreateNew()
         {
+            var path = System.IO.Path.GetDirectoryName(new Uri(typeof(EvrPresenter).Assembly.CodeBase).LocalPath);
+            var dlltoload = System.IO.Path.Combine(path, IntPtr.Size == 8 ? @"EvrPresenter64.dll" : @"EvrPresenter32.dll");
+            return CreateNew(dlltoload);
+        }
+
+        /// <summary>
+        /// Create a new EVR video presenter
+        /// </summary>
+        /// <returns></returns>
+        public static EvrPresenter CreateNew(string dlltoload)
+        {
             //            object comObject;
             //            int hr;
 
@@ -209,8 +220,6 @@ namespace WPFMediaKit.MediaFoundation
             IMFVideoPresenter presenter = null;
             try
             {
-                var path = System.IO.Path.GetDirectoryName(new Uri(typeof(EvrPresenter).Assembly.CodeBase).LocalPath);
-                var dlltoload = System.IO.Path.Combine(path, IntPtr.Size == 8 ? @"EvrPresenter64.dll" : @"EvrPresenter32.dll");
                 presenter = COMUtil.CreateFromDll<IMFVideoPresenter>(dlltoload, EVR_PRESENTER_CLSID);
 
                 int count;
