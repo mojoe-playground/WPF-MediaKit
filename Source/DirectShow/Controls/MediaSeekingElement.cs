@@ -230,7 +230,7 @@ namespace WPFMediaKit.DirectShow.Controls
         /// <summary>
         /// Internal reference to the MediaSeekingPlayer
         /// </summary>
-        protected MediaSeekingPlayer MediaSeekingPlayer
+        public MediaSeekingPlayer MediaSeekingPlayer
         {
             get { return MediaPlayerBase as MediaSeekingPlayer; }
         }
