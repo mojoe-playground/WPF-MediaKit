@@ -164,7 +164,12 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// The DirectShow filter graph
         /// </summary>
-        protected IGraphBuilder m_graph;
+        private IGraphBuilder m_graph;
+
+        public IGraphBuilder Graph
+        {
+            get { return m_graph; }
+        }
 
         /// <summary>
         /// The renderer used to render video to WPF
