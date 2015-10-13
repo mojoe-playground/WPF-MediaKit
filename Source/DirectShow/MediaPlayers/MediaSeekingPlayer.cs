@@ -20,6 +20,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         private IMediaSeeking m_mediaSeeking;
 
+        public IMediaSeeking MediaSeeking
+        {
+            get { return m_mediaSeeking; }
+        }
+
         /// <summary>
         /// Gets the duration in miliseconds, of the media that is opened
         /// </summary>
@@ -139,7 +144,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
 
             if (m_mediaSeeking != null)
                 Marshal.ReleaseComObject(m_mediaSeeking);
-            
+
             m_mediaSeeking = null;
             m_currentPosition = 0;
         }
