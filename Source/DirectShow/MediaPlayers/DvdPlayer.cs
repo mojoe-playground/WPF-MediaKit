@@ -406,7 +406,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         /// <param name="widthRatio">The percentage to the right</param>
         /// <param name="heightRatio">The percentage to the bottom</param>
-        public void SelectAtPosition(double widthRatio, double heightRatio)
+        public virtual void SelectAtPosition(double widthRatio, double heightRatio)
         {
             VerifyAccess();
 
@@ -442,7 +442,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         /// <param name="widthRatio">The ratio to the right</param>
         /// <param name="heightRatio">The ratio to the bottom</param>
-        public void ActivateAtPosition(double widthRatio, double heightRatio)
+        public virtual void ActivateAtPosition(double widthRatio, double heightRatio)
         {
             VerifyAccess();
 
