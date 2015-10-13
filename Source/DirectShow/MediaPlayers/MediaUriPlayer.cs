@@ -51,11 +51,12 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// We keep reference to this so we can dispose 
         /// of it later.
         /// </summary>
-        protected IGraphBuilder m_graph;
+        private IGraphBuilder m_graph;
 
         public IGraphBuilder Graph
         {
             get { return m_graph; }
+            protected set { m_graph = value; }
         }
 
 

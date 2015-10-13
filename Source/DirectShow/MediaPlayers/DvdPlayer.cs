@@ -144,7 +144,12 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// Reference to the hidden render window
         /// </summary>
-        protected IVideoWindow m_dummyRenderWindow;
+        private IVideoWindow m_dummyRenderWindow;
+
+        protected IVideoWindow DummyRenderWindow {
+            get { return m_dummyRenderWindow; }
+            set { m_dummyRenderWindow = value; }
+        }
 
         /// <summary>
         /// The total number of DVD buttons currently on screen
@@ -154,27 +159,45 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// The main interface for DVD control
         /// </summary>
-        protected IDvdControl2 m_dvdControl;
+        private IDvdControl2 m_dvdControl;
+
+        protected IDvdControl2 DvdControl
+        {
+            get { return m_dvdControl; }
+            set { m_dvdControl = value; }
+        }
 
         /// <summary>
         /// The main interface for DVD information
         /// </summary>
-        protected IDvdInfo2 m_dvdInfo;
+        private IDvdInfo2 m_dvdInfo;
+
+        protected IDvdInfo2 DvdInfo
+        {
+            get { return m_dvdInfo; }
+            set { m_dvdInfo = value; }
+        }
 
         /// <summary>
         /// The DirectShow filter graph
         /// </summary>
-        protected IGraphBuilder m_graph;
+        private IGraphBuilder m_graph;
 
         public IGraphBuilder Graph
         {
             get { return m_graph; }
+            protected set { m_graph = value; }
         }
 
         /// <summary>
         /// The renderer used to render video to WPF
         /// </summary>
-        protected IBaseFilter m_renderer;
+        private IBaseFilter m_renderer;
+
+        protected IBaseFilter Renderer {
+            get { return m_renderer; }
+            set { m_renderer = value; }
+        }
 
 #if DEBUG
         /// <summary>
@@ -201,7 +224,13 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// The input pin of the dummy renderer
         /// </summary>
-        protected IPin m_dummyRendererPin;
+        private IPin m_dummyRendererPin;
+
+        protected IPin DummyRendererPin
+        {
+            get { return m_dummyRendererPin; }
+            set { m_dummyRendererPin = value; }
+        }
 
         /// <summary>
         /// Fires when a DVD has been inserted
