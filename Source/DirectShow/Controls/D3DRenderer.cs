@@ -82,7 +82,7 @@ namespace WPFMediaKit.DirectShow.Controls
 
         private void OnStretchChanged(DependencyPropertyChangedEventArgs e)
         {
-            m_videoImage.Stretch = (Stretch) e.NewValue;
+            m_videoImage.Stretch = (Stretch)e.NewValue;
         }
         #endregion
 
@@ -113,7 +113,7 @@ namespace WPFMediaKit.DirectShow.Controls
         }
 
         #endregion
-        
+
         #region IsRenderingEnabled
 
         public static readonly DependencyProperty IsRenderingEnabledProperty =
@@ -474,6 +474,15 @@ namespace WPFMediaKit.DirectShow.Controls
             }
         }
 
+
+        protected bool BackBufferInitialized
+        {
+            get
+            {
+                return m_pBackBuffer != IntPtr.Zero;
+            }
+        }
+
         /// <summary>
         /// Renders the video with WPF's rendering using the CompositionTarget.Rendering event
         /// </summary>
@@ -489,7 +498,7 @@ namespace WPFMediaKit.DirectShow.Controls
                  * then hook into the event */
                 if (value && !m_renderOnCompositionTargetRendering)
                     CompositionTarget.Rendering += CompositionTargetRendering;
-                else if(!value)
+                else if (!value)
                     CompositionTarget.Rendering -= CompositionTargetRendering;
 
                 m_renderOnCompositionTargetRendering = value;
@@ -509,7 +518,7 @@ namespace WPFMediaKit.DirectShow.Controls
             /* We only do this if target rendering is enabled because we must use an Invoke
              * instead of a BeginInvoke to keep the Surfaces in sync and Invoke could be dangerous
              * in other situations */
-            if(RenderOnCompositionTargetRendering)
+            if (RenderOnCompositionTargetRendering)
             {
                 if (!D3DImage.Dispatcher.CheckAccess())
                 {
@@ -543,7 +552,7 @@ namespace WPFMediaKit.DirectShow.Controls
         protected void InternalInvalidateVideoImage()
         {
             /* Ensure we run on the correct Dispatcher */
-            if(!D3DImage.Dispatcher.CheckAccess())
+            if (!D3DImage.Dispatcher.CheckAccess())
             {
                 D3DImage.Dispatcher.Invoke((Action)(() => InvalidateVideoImage()));
                 return;
