@@ -144,7 +144,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// Reference to the hidden render window
         /// </summary>
-        private IVideoWindow m_dummyRenderWindow;
+        protected IVideoWindow m_dummyRenderWindow;
 
         /// <summary>
         /// The total number of DVD buttons currently on screen
@@ -154,22 +154,22 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// The main interface for DVD control
         /// </summary>
-        private IDvdControl2 m_dvdControl;
+        protected IDvdControl2 m_dvdControl;
 
         /// <summary>
         /// The main interface for DVD information
         /// </summary>
-        private IDvdInfo2 m_dvdInfo;
+        protected IDvdInfo2 m_dvdInfo;
 
         /// <summary>
         /// The DirectShow filter graph
         /// </summary>
-        private IGraphBuilder m_graph;
+        protected IGraphBuilder m_graph;
 
         /// <summary>
         /// The renderer used to render video to WPF
         /// </summary>
-        private IBaseFilter m_renderer;
+        protected IBaseFilter m_renderer;
 
 #if DEBUG
         /// <summary>
@@ -196,7 +196,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// The input pin of the dummy renderer
         /// </summary>
-        private IPin m_dummyRendererPin;
+        protected IPin m_dummyRendererPin;
 
         /// <summary>
         /// Fires when a DVD has been inserted
@@ -579,7 +579,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// Builds the DVD DirectShow graph
         /// </summary>
-        private void BuildGraph()
+        protected virtual void BuildGraph()
         {
             try
             {
