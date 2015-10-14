@@ -20,7 +20,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         private IMediaSeeking m_mediaSeeking;
 
-        public IMediaSeeking MediaSeeking
+        protected IMediaSeeking MediaSeeking
         {
             get { return m_mediaSeeking; }
         }
