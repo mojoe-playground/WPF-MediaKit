@@ -14,5 +14,6 @@
         <file src="bin\Release\x64\EVRPresenter64.dll" target="build\native\EVRPresenter64.dll" />
       <file src="bin\Release\x86\EVRPresenter32.dll" target="build\net45\EVRPresenter32.dll" />
       <file src="bin\Release\x64\EVRPresenter64.dll" target="build\net45\EVRPresenter64.dll" />
+      <file src="EVRPresenter.txt" target="content\net45\EVRPresenter.txt" />
     </files>
 </package>

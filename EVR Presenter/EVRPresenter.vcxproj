@@ -223,6 +223,9 @@
   <ItemGroup>
     <ResourceCompile Include="EVRPresenter.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="EVRPresenter.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
