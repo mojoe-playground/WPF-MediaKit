@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>VideoPlayer.EVRPesenter</id>
+        <version>1.0.0</version>
+        <authors>mojoe</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>EVRPesenter patched for VideoPlayer</description>
+    </metadata>
+    <files>
+        <file src="VideoPlayer.EVRPresenter.targets" target="build\VideoPlayer.EVRPresenter.targets" />
+        <file src="bin\Release\x86\EVRPresenter32.dll" target="build\EVRPresenter32.dll" />
+        <file src="bin\Release\x64\EVRPresenter64.dll" target="build\EVRPresenter64.dll" />
+    </files>
+</package>

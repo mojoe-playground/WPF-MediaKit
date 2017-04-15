@@ -202,7 +202,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="EVRPresenter.def" />
+    <None Include="EVRPresenter.nuspec" />
     <None Include="Readme.txt" />
+    <None Include="VideoPlayer.EVRPresenter.targets" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="critsec.h" />
