@@ -1,19 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
-        <id>VideoPlayer.EVRPesenter</id>
+        <id>VideoPlayer.EVRPresenter</id>
         <version>1.0.0</version>
         <authors>mojoe</authors>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>EVRPesenter patched for VideoPlayer</description>
+        <description>EVRPresenter patched for VideoPlayer</description>
         <tags>EVRPresenter native nativepackage</tags>
     </metadata>
     <files>
         <file src="VideoPlayer.EVRPresenter.targets" target="build\VideoPlayer.EVRPresenter.targets" />
         <file src="bin\Release\x86\EVRPresenter32.dll" target="build\native\EVRPresenter32.dll" />
         <file src="bin\Release\x64\EVRPresenter64.dll" target="build\native\EVRPresenter64.dll" />
-      <file src="bin\Release\x86\EVRPresenter32.dll" target="build\net45\EVRPresenter32.dll" />
-      <file src="bin\Release\x64\EVRPresenter64.dll" target="build\net45\EVRPresenter64.dll" />
       <file src="EVRPresenter.txt" target="content\net45\EVRPresenter.txt" />
     </files>
 </package>
