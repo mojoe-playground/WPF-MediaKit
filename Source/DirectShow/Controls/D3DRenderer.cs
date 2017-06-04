@@ -386,7 +386,7 @@ namespace WPFMediaKit.DirectShow.Controls
             try
             {
                 D3DImage.Lock();
-                D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
+                D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer, RenderCapability.Tier >> 16 == 0);
                 D3DImage.Unlock();
                 SetNaturalWidthHeight();
             }
@@ -563,7 +563,7 @@ namespace WPFMediaKit.DirectShow.Controls
             SetBackBufferInternal(m_pBackBuffer);
 
             /* Only render the video image if possible, or if IsRenderingEnabled is true */
-            if (D3DImage.IsFrontBufferAvailable && IsRenderingEnabled && m_pBackBuffer != IntPtr.Zero)
+            if ((D3DImage.IsFrontBufferAvailable || RenderCapability.Tier >> 16 == 0) && IsRenderingEnabled && m_pBackBuffer != IntPtr.Zero)
             {
                 try
                 {
