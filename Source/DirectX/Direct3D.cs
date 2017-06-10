@@ -69,7 +69,7 @@ namespace WPFMediaKit.DirectX
         int GetFrontBufferData();
         [PreserveSig, SuppressUnmanagedCodeSecurity]
         int StretchRect(IntPtr pSourceSurface, DsRect pSourceRect, IDirect3DSurface9 pDestSurface, DsRect pDestRect, int Filter);
-        int ColorFill();
+        int ColorFill(IDirect3DSurface9 pSurface, DsRect pRect, uint color);
         int CreateOffscreenPlainSurface();
         int SetRenderTarget();
         [PreserveSig, SuppressUnmanagedCodeSecurity]
