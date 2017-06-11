@@ -52,13 +52,40 @@ namespace WPFMediaKit.DirectX
 
             /* This will throw an exception
              * if the device is lost */
-            int hr = Device.TestCooperativeLevel();
+            int hr = Device.CheckDeviceState(_windowHandle);
+
+            switch (hr)
+            {
+                case 0 /*S_OK*/:
+                case 2168 /*S_PRESENT_OCCLUDED*/:
+                case 2167 /*S_PRESENT_MODE_CHANGED*/:
+                    // state is DeviceOK
+                    hr = 0;
+                    break;
+
+                case 2152 /*D3DERR_DEVICELOST*/:
+                case 2164 /*D3DERR_DEVICEHUNG*/:
+                    // Lost/hung device. Destroy the device and create a new one.
+                    CreateDevice(true);
+                    break;
+
+                case 2160 /*D3DERR_DEVICEREMOVED*/:
+                    // This is a fatal error.
+                    CreateDevice(true);
+                    break;
+
+                case unchecked((int)0x80070057L) /*E_INVALIDARG*/:
+                    // CheckDeviceState can return E_INVALIDARG if the window is not valid
+                    // We'll assume that the window was destroyed; we'll recreate the device
+                    // if the application sets a new window.
+                    hr = 0;
+                    break;
+            }
 
             /* Do nothing if S_OK */
             if (hr == 0)
                 return lastVersion != DeviceVersion;
 
-            CreateDevice(true);
             return true;
         }
 

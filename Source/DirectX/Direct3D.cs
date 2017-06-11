@@ -160,7 +160,7 @@ namespace WPFMediaKit.DirectX
      InterfaceType(ComInterfaceType.InterfaceIsIUnknown), SuppressUnmanagedCodeSecurity]
     public interface IDirect3DDevice9Ex : IDirect3DDevice9
     {
-        [PreserveSig, SuppressUnmanagedCodeSecurity]
+        [PreserveSig, SuppressUnmanagedCodeSecurity, Obsolete("TestCooperativeLevel is no longer available for use. Instead, use CheckDeviceState.")]
         new int TestCooperativeLevel();
         [PreserveSig, SuppressUnmanagedCodeSecurity]
         new int GetAvailableTextureMem();
