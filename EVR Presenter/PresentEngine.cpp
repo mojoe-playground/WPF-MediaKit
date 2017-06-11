@@ -232,7 +232,6 @@ HRESULT D3DPresentEngine::CreateVideoSamples(IMFMediaType *pFormat, VideoSampleL
   CHECK_HR(hr = m_pDevice->SetRenderTarget(0, m_pRenderSurface));
 
   // 1. Get the back buffer surface 
-  CHECK_HR(pTexture->GetSurfaceLevel(0, &pSurface));
   CHECK_HR(hr = m_pDevice->ColorFill(m_pRenderSurface, NULL, clrBlack));
 
 done:
