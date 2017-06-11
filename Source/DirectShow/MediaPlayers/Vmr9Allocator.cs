@@ -354,14 +354,14 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                     DxSurfaces = new IntPtr[lpNumBuffers];
 
                     /* This is where the magic happens, surfaces are allocated */
-                    // hr = m_allocatorNotify.AllocateSurfaceHelper(ref lpAllocInfo, ref lpNumBuffers, DxSurfaces);
+                    hr = m_allocatorNotify.AllocateSurfaceHelper(ref lpAllocInfo, ref lpNumBuffers, DxSurfaces);
 
-                    // if (hr < 0)
+                    if (hr < 0)
                     {
-                       //  FreeSurfaces();
+                        FreeSurfaces();
 
                         
-                        // if (lpAllocInfo.Format > 0)
+                        if (lpAllocInfo.Format > 0)
                         {
                             hr = m_device.CreateTexture(lpAllocInfo.dwWidth, 
                                                         lpAllocInfo.dwHeight, 
