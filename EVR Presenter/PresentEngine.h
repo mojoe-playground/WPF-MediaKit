@@ -89,5 +89,6 @@ protected:
 	IDirect3DDevice9Ex          *m_pDevice;
 	IDirect3DDeviceManager9     *m_pDeviceManager;        // Direct3D device manager.
 	IDirect3DSurface9						*m_pRenderSurface;
+	IDirect3DTexture9						*m_pRenderTexture;
 
 };

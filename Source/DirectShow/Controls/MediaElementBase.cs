@@ -309,9 +309,9 @@ namespace WPFMediaKit.DirectShow.Controls
             OnMediaPlayerFailed(e);
         }
 
-        private void OnMediaPlayerNewAllocatorSurfacePrivate(object sender, IntPtr pSurface)
+        private void OnMediaPlayerNewAllocatorSurfacePrivate(object sender, IntPtr pSurface, IntPtr pTexture)
         {
-            OnMediaPlayerNewAllocatorSurface(pSurface);
+            OnMediaPlayerNewAllocatorSurface(pSurface, pTexture);
         }
 
         private void OnMediaPlayerNewAllocatorFramePrivate()
@@ -359,7 +359,8 @@ namespace WPFMediaKit.DirectShow.Controls
         /// Is executes when a new D3D surfaces has been allocated
         /// </summary>
         /// <param name="pSurface">The pointer to the D3D surface</param>
-        protected virtual void OnMediaPlayerNewAllocatorSurface(IntPtr pSurface)
+        /// <param name="pTexture">The pointer to the D3D texture, if available</param>
+        protected virtual void OnMediaPlayerNewAllocatorSurface(IntPtr pSurface, IntPtr pTexture)
         {
             SetBackBuffer(pSurface);
         }

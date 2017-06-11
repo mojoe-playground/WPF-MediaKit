@@ -44,7 +44,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
     /// </summary>
     /// <param name="sender">The sender of the event</param>
     /// <param name="pSurface">The pointer to the D3D surface</param>
-    public delegate void NewAllocatorSurfaceDelegate(object sender, IntPtr pSurface);
+    public delegate void NewAllocatorSurfaceDelegate(object sender, IntPtr pSurface, IntPtr pTexture);
 
     /// <summary>
     /// The arguments that store information about a failed media attempt
@@ -749,9 +749,9 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// Local event handler for the custom allocator's new surface event
         /// </summary>
-        private void CustomAllocatorNewAllocatorSurface(object sender, IntPtr pSurface)
+        private void CustomAllocatorNewAllocatorSurface(object sender, IntPtr pSurface, IntPtr pTexture)
         {
-            InvokeNewAllocatorSurface(pSurface);
+            InvokeNewAllocatorSurface(pSurface, pTexture);
         }
 
         /// <summary>
@@ -1097,11 +1097,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// Invokes the NewAllocatorSurface event, notifying any subscriber of a new surface
         /// </summary>
         /// <param name="pSurface">The COM pointer to the D3D surface</param>
-        protected void InvokeNewAllocatorSurface(IntPtr pSurface)
+        protected void InvokeNewAllocatorSurface(IntPtr pSurface, IntPtr pTexture)
         {
             var del = NewAllocatorSurface;
             if (del != null)
-                del(this, pSurface);
+                del(this, pSurface, pTexture);
         }
 
         #endregion

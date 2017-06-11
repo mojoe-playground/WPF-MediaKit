@@ -31,6 +31,7 @@ D3DPresentEngine::D3DPresentEngine(HRESULT& hr) :
   m_pDevice(NULL),
   m_pDeviceManager(NULL),
   m_pRenderSurface(NULL),
+  m_pRenderTexture(NULL),
   m_bufferCount(3),
   m_pCallback(NULL)
 {
@@ -226,7 +227,12 @@ HRESULT D3DPresentEngine::CreateVideoSamples(IMFMediaType *pFormat, VideoSampleL
   }
 
   // Create a renderSurface with the same size as our sample
-  CHECK_HR(hr = m_pDevice->CreateRenderTarget(width, height, d3dFormat, D3DMULTISAMPLE_NONE, 0, TRUE, &m_pRenderSurface, NULL));
+  CHECK_HR(hr = m_pDevice->CreateTexture(width, height, 1, D3DUSAGE_RENDERTARGET, d3dFormat, D3DPOOL_DEFAULT, &m_pRenderTexture, NULL));
+  CHECK_HR(hr = m_pRenderTexture->GetSurfaceLevel(0, &m_pRenderSurface));
+  CHECK_HR(hr = m_pDevice->SetRenderTarget(0, m_pRenderSurface));
+
+  // 1. Get the back buffer surface 
+  CHECK_HR(pTexture->GetSurfaceLevel(0, &pSurface));
   CHECK_HR(hr = m_pDevice->ColorFill(m_pRenderSurface, NULL, clrBlack));
 
 done:
@@ -252,7 +258,8 @@ done:
 
 void D3DPresentEngine::ReleaseResources()
 {
-  SafeRelease(&m_pRenderSurface);
+	SafeRelease(&m_pRenderTexture);
+	SafeRelease(&m_pRenderSurface);
 }
 
 //-----------------------------------------------------------------------------
@@ -368,7 +375,7 @@ HRESULT D3DPresentEngine::PresentSample(IMFSample* pSample, LONGLONG llTarget)
 */
 
   if(hrCopy == S_OK && m_pCallback)// Do the callback
-    m_pCallback->PresentSurfaceCB(m_pRenderSurface);	
+    m_pCallback->PresentSurfaceCB(m_pRenderSurface, m_pRenderTexture);	
 
 
   SafeRelease(&pSurface);

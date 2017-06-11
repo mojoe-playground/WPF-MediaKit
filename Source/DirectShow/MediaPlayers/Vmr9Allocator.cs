@@ -113,10 +113,10 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// Fires the OnNewAllocatorSurface event, notifying the
         /// subscriber that new surfaces are available
         /// </summary>
-        private void InvokeNewSurfaceEvent(IntPtr pSurface)
+        private void InvokeNewSurfaceEvent(IntPtr pSurface, IntPtr pTexture)
         {
             if (NewAllocatorSurface != null)
-                NewAllocatorSurface(this, pSurface);
+                NewAllocatorSurface(this, pSurface, pTexture);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
 
             if (disposing)
             {
-                InvokeNewSurfaceEvent(IntPtr.Zero);
+                InvokeNewSurfaceEvent(IntPtr.Zero, IntPtr.Zero);
                 /* Pass a dummy cookie to TerminateDevice */
                 TerminateDevice(IntPtr.Zero);
                
@@ -395,7 +395,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 }
 
                 /* Nofity to our listeners we have new surfaces */
-                InvokeNewSurfaceEvent(m_privateSurface != null ? GetComPointer(m_privateSurface) : DxSurfaces[0]);
+                InvokeNewSurfaceEvent(m_privateSurface != null ? GetComPointer(m_privateSurface) : DxSurfaces[0], m_privateSurface != null ? GetComPointer(m_privateTexture) : IntPtr.Zero);
 
                 return hr;
             }

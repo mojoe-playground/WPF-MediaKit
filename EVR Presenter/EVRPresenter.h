@@ -71,7 +71,7 @@ MIDL_INTERFACE("B92D8991-6C42-4e51-B942-E61CB8696FCB")
 IEVRPresenterCallback : public IUnknown
 {
 public:
-  virtual HRESULT STDMETHODCALLTYPE PresentSurfaceCB(IDirect3DSurface9 *pSurface) = 0;
+  virtual HRESULT STDMETHODCALLTYPE PresentSurfaceCB(IDirect3DSurface9 *pSurface, IDirect3DTexture9 *pTexture) = 0;
 };
 
 

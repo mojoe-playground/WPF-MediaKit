@@ -33,7 +33,7 @@ namespace WPFMediaKit.MediaFoundation
     internal interface IEVRPresenterCallback
     {
         [PreserveSig]
-        int PresentSurfaceCB(IntPtr pSurface);
+        int PresentSurfaceCB(IntPtr pSurface, IntPtr pTexture);
     }
 
     [ComVisible(true), ComImport, SuppressUnmanagedCodeSecurity,
@@ -170,11 +170,11 @@ namespace WPFMediaKit.MediaFoundation
         /// </summary>
         /// <param name="pSurface">The Direct3D surface</param>
         /// <returns>A HRESULT</returns>
-        public int PresentSurfaceCB(IntPtr pSurface)
+        public int PresentSurfaceCB(IntPtr pSurface, IntPtr pTexture)
         {
             /* Check if the surface is the same as the last*/
             if (m_lastSurface != pSurface)
-                InvokeNewAllocatorSurface(pSurface);
+                InvokeNewAllocatorSurface(pSurface, pTexture);
 
             /* Store ref to the pointer so we can compare
              * it next time this method is called */
@@ -315,10 +315,10 @@ namespace WPFMediaKit.MediaFoundation
         /// Fires the NewAlloctorSurface event
         /// </summary>
         /// <param name="pSurface">D3D surface pointer</param>
-        private void InvokeNewAllocatorSurface(IntPtr pSurface)
+        private void InvokeNewAllocatorSurface(IntPtr pSurface, IntPtr pTexture)
         {
             var del = NewAllocatorSurface;
-            if (del != null) del(this, pSurface);
+            if (del != null) del(this, pSurface, pTexture);
         }
         #endregion
     }
