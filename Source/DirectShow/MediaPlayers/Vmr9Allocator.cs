@@ -361,7 +361,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                         FreeSurfaces();
 
                         
-                        if (lpAllocInfo.Format > 0)
+                        // if (lpAllocInfo.Format > 0)
                         {
                             hr = m_device.CreateTexture(lpAllocInfo.dwWidth, 
                                                         lpAllocInfo.dwHeight, 

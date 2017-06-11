@@ -169,6 +169,7 @@ namespace WPFMediaKit.MediaFoundation
         /// a frame rendered
         /// </summary>
         /// <param name="pSurface">The Direct3D surface</param>
+        /// <param name="pTexture">The texture belonging to the surface</param>
         /// <returns>A HRESULT</returns>
         public int PresentSurfaceCB(IntPtr pSurface, IntPtr pTexture)
         {
@@ -315,6 +316,7 @@ namespace WPFMediaKit.MediaFoundation
         /// Fires the NewAlloctorSurface event
         /// </summary>
         /// <param name="pSurface">D3D surface pointer</param>
+        /// <param name="pTexture">Pointer to the surface's texture</param>
         private void InvokeNewAllocatorSurface(IntPtr pSurface, IntPtr pTexture)
         {
             var del = NewAllocatorSurface;
