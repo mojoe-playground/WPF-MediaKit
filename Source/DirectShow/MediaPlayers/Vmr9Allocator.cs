@@ -351,17 +351,17 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                     FreeSurfaces();
 
                     /* This is an IntPtr array of pointers to D3D surfaces */
-                    DxSurfaces = new IntPtr[lpNumBuffers];
+                    //DxSurfaces = new IntPtr[lpNumBuffers];
 
                     /* This is where the magic happens, surfaces are allocated */
-                    hr = m_allocatorNotify.AllocateSurfaceHelper(ref lpAllocInfo, ref lpNumBuffers, DxSurfaces);
+                    //hr = m_allocatorNotify.AllocateSurfaceHelper(ref lpAllocInfo, ref lpNumBuffers, DxSurfaces);
 
-                    if (hr < 0)
+                    //if (hr < 0)
                     {
-                        FreeSurfaces();
+                        //FreeSurfaces();
 
                         
-                        if (lpAllocInfo.Format > 0)
+                        //if (lpAllocInfo.Format > 0)
                         {
                             hr = m_device.CreateTexture(lpAllocInfo.dwWidth, 
                                                         lpAllocInfo.dwHeight, 
@@ -378,8 +378,8 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                             DsError.ThrowExceptionForHR(hr);
                         }
 
-                        lpAllocInfo.dwFlags &= ~VMR9SurfaceAllocationFlags.TextureSurface;
-                        lpAllocInfo.dwFlags |= VMR9SurfaceAllocationFlags.OffscreenSurface;
+                        //lpAllocInfo.dwFlags &= ~VMR9SurfaceAllocationFlags.TextureSurface;
+                        //lpAllocInfo.dwFlags |= VMR9SurfaceAllocationFlags.OffscreenSurface;
 
                         DxSurfaces = new IntPtr[lpNumBuffers];
 
