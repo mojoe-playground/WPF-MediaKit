@@ -378,6 +378,14 @@ namespace WPFMediaKit.DirectX
         [StructLayout(LayoutKind.Sequential)]
     public struct D3DSURFACE_DESC
     {
+        D3DFORMAT Format;
+        D3DRESOURCETYPE Type;
+        uint Usage;
+        int Pool;
+        D3DMULTISAMPLE_TYPE MultiSampleType;
+        uint MultiSampleQuality;
+        uint Width;
+        uint Height;
     }
 
 
