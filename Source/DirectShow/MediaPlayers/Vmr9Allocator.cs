@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using DirectShowLib;
@@ -19,34 +18,9 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         private const int E_FAIL = unchecked((int)0x80004005);
 
         /// <summary>
-        /// The SDK version of D3D we are using
-        /// </summary>
-        private const ushort D3D_SDK_VERSION = 32;
-
-        /// <summary>
         /// Lock for shared resources
         /// </summary>
         private static object m_staticLock = new object();
-        
-        /// <summary>
-        /// Direct3D functions
-        /// </summary>
-        private IDirect3D9 m_d3d;
-
-        /// <summary>
-        /// Direct3D functions of Vista
-        /// </summary>
-        private IDirect3D9Ex m_d3dEx;
-
-        /// <summary>
-        /// The window handle, needed for D3D intialization
-        /// </summary>
-        private readonly static IntPtr m_hWnd;
-
-        /// <summary>
-        /// The Direct3D device
-        /// </summary>
-        private IDirect3DDevice9 m_device;
 
         /// <summary>
         /// Lock for instance's resources
@@ -85,28 +59,18 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         private IDirect3DTexture9 m_privateTexture;
 
-        [DllImport("user32.dll", SetLastError = false)]
-        private static extern IntPtr GetDesktopWindow();
-
-        static Vmr9Allocator()
-        {
-            m_hWnd = GetDesktopWindow();
-
-           
-        }
+        private readonly DeviceManager _deviceManager;
+        private int _deviceVersion;
 
         /// <summary>
         /// Creates a new VMR9 custom allocator to use with Direct3D
         /// </summary>
-        public Vmr9Allocator()
+        public Vmr9Allocator(DeviceManager manager)
         {
-            /* Use the 9Ex for Vista */
-            if (IsVistaOrBetter)
-                Direct3D.Direct3DCreate9Ex(D3D_SDK_VERSION, out m_d3dEx);
-            else /* For XP */
-                m_d3d = Direct3D.Direct3DCreate9(D3D_SDK_VERSION);
-
-            CreateDevice();
+            _deviceManager = manager;
+            _deviceManager.Initialize();
+            _deviceManager.CreateDevice();
+            _deviceVersion = _deviceManager.DeviceVersion;
         }
 
         /// <summary>
@@ -156,24 +120,6 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                     Marshal.FinalReleaseComObject(m_allocatorNotify);
                     m_allocatorNotify = null;
                 }
-
-                if (m_d3d != null)
-                {
-                    Marshal.FinalReleaseComObject(m_d3d);
-                    m_d3d = null;
-                }
-
-                if (m_d3dEx != null)
-                {
-                    Marshal.FinalReleaseComObject(m_d3dEx);
-                    m_d3dEx = null;
-                }
-
-                if (m_device != null)
-                {
-                    Marshal.FinalReleaseComObject(m_device);
-                    m_device = null;
-                }
             }
 
             m_disposed = true;
@@ -195,7 +141,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <returns>Returns an HRESULT</returns>
         public int StartPresenting(IntPtr userId)
         {
-            return m_device == null ? E_FAIL : 0;
+            return _deviceManager.Device == null ? E_FAIL : 0;
         }
 
         /// <summary>
@@ -237,11 +183,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                     TestRestoreLostDevice();
 
                     if (m_privateSurface != null)
-                        hr = m_device.StretchRect(presInfo.lpSurf,
-                                                  presInfo.rcSrc,
-                                                  m_privateSurface,
-                                                  presInfo.rcDst,
-                                                  0);
+                        hr = _deviceManager.Device.StretchRect(presInfo.lpSurf,
+                                                               presInfo.rcSrc,
+                                                               m_privateSurface,
+                                                               presInfo.rcDst,
+                                                               0);
                     if (hr < 0)
                         return hr;
                 }
@@ -268,29 +214,21 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// </summary>
         private void TestRestoreLostDevice()
         {
-            if (m_device == null)
-                return;
+            if (_deviceManager.TestRestoreLostDevice(_deviceVersion))
+            {
+                FreeSurfaces();
+                _deviceVersion = _deviceManager.DeviceVersion;
 
-            /* This will throw an exception
-             * if the device is lost */
-            int hr = m_device.TestCooperativeLevel();
+                /* TODO: This is bad. FIX IT! 
+                 * Figure out how to tell when the new
+                 * device is ready to use */
+                Thread.Sleep(1500);
 
-            /* Do nothing if S_OK */
-            if (hr == 0)
-                return;
+                IntPtr pDev = GetComPointer(_deviceManager.Device);
 
-            FreeSurfaces();
-            CreateDevice();
-
-            /* TODO: This is bad. FIX IT! 
-             * Figure out how to tell when the new
-             * device is ready to use */
-            Thread.Sleep(1500);
-
-            IntPtr pDev = GetComPointer(m_device);
-
-            /* Update with our new device */
-            m_allocatorNotify.ChangeD3DDevice(pDev, GetAdapterMonitor(0));
+                /* Update with our new device */
+                m_allocatorNotify.ChangeD3DDevice(pDev, GetAdapterMonitor(0));
+            }
         }
 
         /// <summary>
@@ -300,7 +238,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <returns>A pointer to the adaptor monitor</returns>
         private IntPtr GetAdapterMonitor(uint adapterOrdinal)
         {
-            IntPtr pMonitor = IsVistaOrBetter ? m_d3dEx.GetAdapterMonitor(adapterOrdinal) : m_d3d.GetAdapterMonitor(adapterOrdinal);
+            IntPtr pMonitor =_deviceManager.D3d.GetAdapterMonitor(adapterOrdinal);
 
             return pMonitor;
         }
@@ -337,7 +275,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 {
                     /* These two pointers are passed to the the helper
                      * to create our D3D surfaces */
-                    var pDevice = GetComPointer(m_device);
+                    var pDevice = GetComPointer(_deviceManager.Device);
                     var pMonitor = GetAdapterMonitor(0);
 
                     /* Setup our D3D Device with our renderer */
@@ -363,14 +301,14 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                         
                         if (lpAllocInfo.Format > 0)
                         {
-                            hr = m_device.CreateTexture(lpAllocInfo.dwWidth, 
-                                                        lpAllocInfo.dwHeight, 
-                                                        1, 
-                                                        1,
-                                                        D3DFORMAT.D3DFMT_X8R8G8B8, 
-                                                        0, 
-                                                        out m_privateTexture, 
-                                                        IntPtr.Zero);
+                            hr = _deviceManager.Device.CreateTexture(lpAllocInfo.dwWidth, 
+                                                                     lpAllocInfo.dwHeight, 
+                                                                     1, 
+                                                                     1,
+                                                                     D3DFORMAT.D3DFMT_X8R8G8B8, 
+                                                                     0, 
+                                                                     out m_privateTexture, 
+                                                                     IntPtr.Zero);
 
                             DsError.ThrowExceptionForHR(hr);
 
@@ -479,7 +417,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 m_allocatorNotify = lpIVMRSurfAllocNotify;
 
                 var pMonitor = GetAdapterMonitor(0);
-                var pDevice = GetComPointer(m_device);
+                var pDevice = GetComPointer(_deviceManager.Device);
                 return m_allocatorNotify.SetD3DDevice(pDevice, pMonitor);
             }
         }
@@ -509,56 +447,6 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         ~Vmr9Allocator()
         {
             Dispose();
-        }
-
-        /// <summary>
-        /// Gets if the current operating system is
-        /// Windows Vista or higher.
-        /// </summary>
-        private static bool IsVistaOrBetter
-        {
-            get
-            {
-                return Environment.OSVersion.Version.Major >= 6;
-            }
-        }
-
-        /// <summary>
-        /// Creates a Direct3D device
-        /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        private void CreateDevice()
-        {
-            if (m_device != null)
-                return;
-
-            var param = new D3DPRESENT_PARAMETERS
-            {
-                Windowed = 1,
-                Flags = ((short)D3DPRESENTFLAG.D3DPRESENTFLAG_VIDEO),
-                BackBufferFormat = D3DFORMAT.D3DFMT_X8R8G8B8,
-                SwapEffect = D3DSWAPEFFECT.D3DSWAPEFFECT_COPY
-            };
-
-            /* The COM pointer to our D3D Device */
-            IntPtr dev;
-
-            /* Windows Vista runs much more performant with the IDirect3DDevice9Ex */
-            if (IsVistaOrBetter)
-            {
-                m_d3dEx.CreateDeviceEx(0, D3DDEVTYPE.D3DDEVTYPE_HAL, m_hWnd,
-                  CreateFlags.D3DCREATE_SOFTWARE_VERTEXPROCESSING | CreateFlags.D3DCREATE_MULTITHREADED,
-                  ref param, IntPtr.Zero, out dev);
-            }
-            else/* Windows XP */
-            {
-                m_d3d.CreateDevice(0, D3DDEVTYPE.D3DDEVTYPE_HAL, m_hWnd,
-                  CreateFlags.D3DCREATE_SOFTWARE_VERTEXPROCESSING | CreateFlags.D3DCREATE_MULTITHREADED,
-                  ref param, out dev);
-            }
-
-            m_device = (IDirect3DDevice9)Marshal.GetObjectForIUnknown(dev);
-            Marshal.Release(dev);
         }
 
         /// <summary>

@@ -16,6 +16,8 @@ using Size = System.Windows.Size;
 
 namespace WPFMediaKit.DirectShow.MediaPlayers
 {
+    using DirectX;
+
     public enum MediaState
     {
         Manual,
@@ -271,6 +273,8 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// for the WndProc callback method.
         /// </summary>
         private int? m_graphInstanceId;
+
+        public DeviceManager DeviceManager { get; } = new DeviceManager();
 
         /// <summary>
         /// The globally unqiue identifier of the graph
@@ -829,10 +833,10 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
             switch (rendererType)
             {
                 case VideoRendererType.VideoMixingRenderer9:
-                    renderer = CreateVideoMixingRenderer9(graph, streamCount);
+                    renderer = CreateVideoMixingRenderer9(graph, streamCount, DeviceManager);
                     break;
                 case VideoRendererType.EnhancedVideoRenderer:
-                    renderer = CreateEnhancedVideoRenderer(graph, streamCount);
+                    renderer = CreateEnhancedVideoRenderer(graph, streamCount, DeviceManager);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("rendererType");
@@ -855,7 +859,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// <summary>
         /// Creates an instance of the EVR
         /// </summary>
-        private IBaseFilter CreateEnhancedVideoRenderer(IGraphBuilder graph, int streamCount)
+        private IBaseFilter CreateEnhancedVideoRenderer(IGraphBuilder graph, int streamCount, DeviceManager manager)
         {
             EvrPresenter presenter;
             IBaseFilter filter;
@@ -875,7 +879,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                     throw new Exception("Could not QueryInterface for the IMFVideoRenderer");
 
                 /* Create a new EVR presenter */
-                presenter = EvrPresenter.CreateNew();
+                presenter = EvrPresenter.CreateNew(manager);
 
                 /* Initialize the EVR renderer with the custom video presenter */
                 hr = videoRenderer.InitializeRenderer(null, presenter.VideoPresenter);
@@ -916,7 +920,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         /// Creates a new VMR9 renderer and configures it with an allocator
         /// </summary>
         /// <returns>An initialized DirectShow VMR9 renderer</returns>
-        private IBaseFilter CreateVideoMixingRenderer9(IGraphBuilder graph, int streamCount)
+        private IBaseFilter CreateVideoMixingRenderer9(IGraphBuilder graph, int streamCount, DeviceManager manager)
         {
             var vmr9 = new VideoMixingRenderer9() as IBaseFilter;
 
@@ -941,7 +945,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
             if (vmrSurfAllocNotify == null)
                 throw new Exception("Could not query the VMR surface allocator.");
 
-            var allocator = new Vmr9Allocator();
+            var allocator = new Vmr9Allocator(manager);
 
             /* We supply our custom allocator to the renderer */
             hr = vmrSurfAllocNotify.AdviseSurfaceAllocator(m_userId, allocator);

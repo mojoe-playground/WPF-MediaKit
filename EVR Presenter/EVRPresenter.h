@@ -92,6 +92,7 @@ public:
   virtual HRESULT STDMETHODCALLTYPE SetBufferCount(int bufferCount) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetBufferCount(int* bufferCount) = 0;
   virtual HRESULT STDMETHODCALLTYPE RegisterCallback(IEVRPresenterCallback *pCallback) = 0;
+  virtual HRESULT STDMETHODCALLTYPE NotifyDeviceChange(IDirect3D9Ex *pD3d, IDirect3DDevice9Ex *pDevice) = 0;
 };
 
 // Custom Attributes

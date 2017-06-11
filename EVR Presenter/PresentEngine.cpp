@@ -47,13 +47,8 @@ D3DPresentEngine::D3DPresentEngine(HRESULT& hr) :
     return;
   }
 
-  // Create Direct3D
-  CHECK_HR( hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &m_pD3D9));
-
   // Create the device manager
   CHECK_HR (hr = DXVA2CreateDirect3DDeviceManager9(&m_DeviceResetToken, &m_pDeviceManager));
-
-  CHECK_HR (hr = CreateD3DDevice());
 
   LOG_MSG("PresentEngine: created")
 
@@ -477,70 +472,11 @@ HRESULT D3DPresentEngine::CreateD3DDevice()
     return MF_E_NOT_INITIALIZED;
 
   HRESULT     hr = S_OK;
-  HMONITOR    hMonitor = NULL;
-  HWND        hwnd = NULL;
-  UINT        uAdapterID = D3DADAPTER_DEFAULT;
-  D3DCAPS9    ddCaps;
-  ZeroMemory(&ddCaps, sizeof(ddCaps));
-
-  IDirect3DDevice9Ex* pDevice = NULL;
-
-  hwnd = GetDesktopWindow();
-
-  // Note: The presenter creates additional swap chain to present the
-  // video frames. Therefore, it does not use the device's implicit
-  // swap chain, so the size of the back buffer here is 1 x 1.
-
-  D3DPRESENT_PARAMETERS pp;
-
-  ZeroMemory(&pp, sizeof(pp));
-
-  pp.BackBufferWidth = 1;
-  pp.BackBufferHeight = 1;
-  pp.Windowed = TRUE;
-  pp.SwapEffect = D3DSWAPEFFECT_COPY;
-  pp.BackBufferFormat = D3DFMT_UNKNOWN; //D3DFMT_A8R8G8B8;
-  pp.hDeviceWindow = hwnd;
-  pp.Flags = D3DPRESENTFLAG_VIDEO;
-  pp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
-
-  // Find the monitor for this window.
-  if (m_hwnd)
-  {
-    hMonitor = MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST);
-
-    // Find the corresponding adapter.
-    CHECK_HR(hr = FindAdapter(m_pD3D9, hMonitor, &uAdapterID));
-  }
-
-  // Get the device caps for this adapter.
-  CHECK_HR(hr = m_pD3D9->GetDeviceCaps(uAdapterID, D3DDEVTYPE_HAL, &ddCaps));
-  DWORD vp = (ddCaps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) ? D3DCREATE_HARDWARE_VERTEXPROCESSING : D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-
-  // Create the device.
-  CHECK_HR(hr = m_pD3D9->CreateDeviceEx(
-    uAdapterID,
-    D3DDEVTYPE_HAL,
-    pp.hDeviceWindow,
-    vp | D3DCREATE_NOWINDOWCHANGES | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
-    &pp, 
-    NULL,
-    &pDevice
-    ));
-
-  // Get the adapter display mode.
-  CHECK_HR(hr = m_pD3D9->GetAdapterDisplayMode(uAdapterID, &m_DisplayMode));
 
   // Reset the D3DDeviceManager with the new device
-  CHECK_HR(hr = m_pDeviceManager->ResetDevice(pDevice, m_DeviceResetToken));
-
-  SafeRelease(&m_pDevice);
-
-  m_pDevice = pDevice;
-  m_pDevice->AddRef();
+  CHECK_HR(hr = m_pDeviceManager->ResetDevice(m_pDevice, m_DeviceResetToken));
 
 done:
-  SafeRelease(&pDevice);
   LOG_IF_FAILED("CreateD3DDevice failed => hr=0x%X", hr);
   return hr;
 }
@@ -640,6 +576,26 @@ HRESULT D3DPresentEngine::GetBufferCount(INT* bufferCount)
 	return S_OK;
 }
 
+//-----------------------------------------------------------------------------
+// NotifyDeviceChange
+//
+// Set the used direct3d device
+//-----------------------------------------------------------------------------
+HRESULT D3DPresentEngine::NotifyDeviceChange(IDirect3D9Ex *pD3d, IDirect3DDevice9Ex *pDevice)
+{
+	if (pD3d != m_pD3D9)
+	{
+		SafeRelease(&m_pD3D9);
+		m_pD3D9 = pD3d;
+		m_pD3D9->AddRef();
+	}
+
+	SafeRelease(&m_pDevice);
+	m_pDevice = pDevice;
+	m_pDevice->AddRef();
+
+	return CreateD3DDevice();
+}
 
 //-----------------------------------------------------------------------------
 // Static functions

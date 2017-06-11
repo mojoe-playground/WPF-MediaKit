@@ -54,7 +54,7 @@ enum FRAMESTEP_STATE
 //  Description: Implements the custom presenter.
 //-----------------------------------------------------------------------------
 
-class EVRCustomPresenter :   
+class EVRCustomPresenter :
 	public IMFVideoDeviceID,
 	public IMFVideoPresenter, // Inherits IMFClockStateSink
 	public IMFRateSupport,
@@ -106,7 +106,7 @@ public:
 	STDMETHOD(GetIdealVideoSize)(SIZE* pszMin, SIZE* pszMax);
 	STDMETHOD(SetVideoPosition)(const MFVideoNormalizedRect* pnrcSource, const LPRECT prcDest);
 	STDMETHOD(GetVideoPosition)(MFVideoNormalizedRect* pnrcSource, LPRECT prcDest);
-	STDMETHOD(SetAspectRatioMode)(DWORD dwAspectRatioMode){ return E_NOTIMPL; }
+	STDMETHOD(SetAspectRatioMode)(DWORD dwAspectRatioMode) { return E_NOTIMPL; }
 	STDMETHOD(GetAspectRatioMode)(DWORD* pdwAspectRatioMode) { return E_NOTIMPL; }
 	STDMETHOD(SetVideoWindow)(HWND hwndVideo);
 	STDMETHOD(GetVideoWindow)(HWND* phwndVideo);
@@ -126,14 +126,15 @@ public:
 	STDMETHODIMP DisableImageExport(BOOL bDisable);
 
 	// IMFVideoPositionMapper
-	STDMETHOD( MapOutputCoordinateToInputStream)(float xOut, float yOut, DWORD dwOutputStreamIndex, DWORD dwInputStreamIndex, float* pxIn,float* pyIn);
+	STDMETHOD(MapOutputCoordinateToInputStream)(float xOut, float yOut, DWORD dwOutputStreamIndex, DWORD dwInputStreamIndex, float* pxIn, float* pyIn);
 
 	// IEVRPresenterSettings methods
 //	STDMETHODIMP GetBufferCount(INT* bufferCount);
 //	STDMETHODIMP SetBufferCount(INT bufferCount);
-	STDMETHODIMP RegisterCallback(IEVRPresenterCallback *pCallback) {return m_pD3DPresentEngine->RegisterCallback(pCallback);}
-	STDMETHODIMP SetBufferCount(int bufferCount) {return  m_pD3DPresentEngine->SetBufferCount(bufferCount);}
-	STDMETHODIMP GetBufferCount(int* bufferCount){return m_pD3DPresentEngine->GetBufferCount(bufferCount);}
+	STDMETHODIMP RegisterCallback(IEVRPresenterCallback *pCallback) { return m_pD3DPresentEngine->RegisterCallback(pCallback); }
+	STDMETHODIMP SetBufferCount(int bufferCount) { return  m_pD3DPresentEngine->SetBufferCount(bufferCount); }
+	STDMETHODIMP GetBufferCount(int* bufferCount) { return m_pD3DPresentEngine->GetBufferCount(bufferCount); }
+	STDMETHODIMP NotifyDeviceChange(IDirect3D9Ex *pD3d, IDirect3DDevice9Ex *pDevice) { return m_pD3DPresentEngine->NotifyDeviceChange(pD3d, pDevice); }
 
 protected:
 	EVRCustomPresenter(HRESULT& hr);

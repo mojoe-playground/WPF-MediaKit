@@ -41,6 +41,7 @@ public:
 	HRESULT SetBufferCount(int bufferCount);
 	HRESULT GetBufferCount(int* bufferCount);
 	HRESULT RegisterCallback(IEVRPresenterCallback *pCallback);
+	HRESULT NotifyDeviceChange(IDirect3D9Ex *pD3d, IDirect3DDevice9Ex *pDevice);
 
 	// GetService: Returns the IDirect3DDeviceManager9 interface.
 	// (The signature is identical to IMFGetService::GetService but
@@ -86,7 +87,7 @@ protected:
 
 	// COM interfaces
 	IDirect3D9Ex                *m_pD3D9;
-	IDirect3DDevice9Ex          *m_pDevice;
+	IDirect3DDevice9Ex            *m_pDevice;
 	IDirect3DDeviceManager9     *m_pDeviceManager;        // Direct3D device manager.
 	IDirect3DSurface9						*m_pRenderSurface;
 	IDirect3DTexture9						*m_pRenderTexture;

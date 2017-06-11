@@ -11,6 +11,9 @@ using WPFMediaKit.MediaFoundation.Interop;
 
 namespace WPFMediaKit.MediaFoundation
 {
+    using System.Threading;
+    using DirectX;
+
     #region Custom COM Types
     /*
     [ComVisible(true), ComImport, SuppressUnmanagedCodeSecurity,
@@ -58,6 +61,9 @@ namespace WPFMediaKit.MediaFoundation
 
         [PreserveSig]
         int RegisterCallback(IEVRPresenterCallback pCallback); // Added
+
+        [PreserveSig]
+        int NotifyDeviceChange(IDirect3D9Ex pD3d, IDirect3DDevice9Ex pDevice);
     }
     #endregion
 
@@ -68,13 +74,43 @@ namespace WPFMediaKit.MediaFoundation
         private IntPtr m_lastSurface;
         private IMFVideoPresenter m_VideoPresenter;
 
-        private EvrPresenter()
+        private DeviceManager _deviceManager;
+        private int _deviceVersion;
+
+        private EvrPresenter(DeviceManager manager)
         {
+            _deviceManager = manager;
+            _deviceManager.Initialize();
+            _deviceManager.CreateDevice();
+            _deviceVersion = _deviceManager.DeviceVersion;
         }
 
         ~EvrPresenter()
         {
             Dispose(false);
+        }
+
+
+        /// <summary>
+        /// Tests if the D3D device has been lost and if it has
+        /// it is retored. This happens on XP with things like
+        /// resolution changes or pressing ctrl + alt + del.  With
+        /// Vista, this will most likely never be called unless the
+        /// video driver hangs or is changed.
+        /// </summary>
+        private void TestRestoreLostDevice()
+        {
+            if (_deviceManager.TestRestoreLostDevice(_deviceVersion))
+            {
+                _deviceVersion = _deviceManager.DeviceVersion;
+
+                /* TODO: This is bad. FIX IT! 
+                 * Figure out how to tell when the new
+                 * device is ready to use */
+                Thread.Sleep(1500);
+
+                NotifyDeviceChange((IEVRPresenterSettings)VideoPresenter, _deviceManager);
+            }
         }
 
         #region Interop
@@ -173,6 +209,8 @@ namespace WPFMediaKit.MediaFoundation
         /// <returns>A HRESULT</returns>
         public int PresentSurfaceCB(IntPtr pSurface, IntPtr pTexture)
         {
+            TestRestoreLostDevice();
+
             /* Check if the surface is the same as the last*/
             if (m_lastSurface != pSurface)
                 InvokeNewAllocatorSurface(pSurface, pTexture);
@@ -191,18 +229,18 @@ namespace WPFMediaKit.MediaFoundation
         /// Create a new EVR video presenter
         /// </summary>
         /// <returns></returns>
-        public static EvrPresenter CreateNew()
+        public static EvrPresenter CreateNew(DeviceManager manager)
         {
             var path = System.IO.Path.GetDirectoryName(new Uri(typeof(EvrPresenter).Assembly.CodeBase).LocalPath);
             var dlltoload = System.IO.Path.Combine(path, IntPtr.Size == 8 ? @"EvrPresenter64.dll" : @"EvrPresenter32.dll");
-            return CreateNew(dlltoload);
+            return CreateNew(dlltoload, manager);
         }
 
         /// <summary>
         /// Create a new EVR video presenter
         /// </summary>
         /// <returns></returns>
-        public static EvrPresenter CreateNew(string dlltoload)
+        public static EvrPresenter CreateNew(string dlltoload, DeviceManager manager)
         {
             //            object comObject;
             //            int hr;
@@ -217,7 +255,7 @@ namespace WPFMediaKit.MediaFoundation
             //          IClassFactory factory = null;
 
             /* Create our 'helper' class */
-            var evrPresenter = new EvrPresenter();
+            var evrPresenter = new EvrPresenter(manager);
             IMFVideoPresenter presenter = null;
             try
             {
@@ -225,6 +263,7 @@ namespace WPFMediaKit.MediaFoundation
 
                 int count;
                 var settings = presenter as IEVRPresenterSettings;
+                NotifyDeviceChange(settings, manager);
                 DsError.ThrowExceptionForHR(settings.RegisterCallback(evrPresenter));
                 DsError.ThrowExceptionForHR(settings.GetBufferCount(out count));
                 DsError.ThrowExceptionForHR(settings.SetBufferCount(PRESENTER_BUFFER_COUNT));
@@ -300,6 +339,11 @@ namespace WPFMediaKit.MediaFoundation
                             throw exception;
 
                         return evrPresenter;*/
+        }
+
+        private static void NotifyDeviceChange(IEVRPresenterSettings settings, DeviceManager manager)
+        {
+            settings.NotifyDeviceChange(manager.D3d, manager.Device);
         }
 
         #region Event Invokers
